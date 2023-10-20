@@ -1,0 +1,25 @@
+{
+  "name": "countdown-bot",
+  "version": "1.0.0",
+  "description": "A telegram bot for countdowns!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/euberdeveloper/countdown-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "countdown",
+    "grammy"
+  ],
+  "author": "Eugenio Vinicio Berretta <euberdeveloper@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/euberdeveloper/countdown-bot/issues"
+  },
+  "homepage": "https://github.com/euberdeveloper/countdown-bot#readme"
+}
