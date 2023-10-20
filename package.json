@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "transpile": "tsc -p src",
+    "transpile": "tsc -p source",
     "start": "node dist/index.js",
     "serve": "npm run transpile && npm start"
   },
