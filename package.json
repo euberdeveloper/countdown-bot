@@ -2,7 +2,8 @@
   "name": "countdown-bot",
   "version": "1.0.0",
   "description": "A telegram bot for countdowns!",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
