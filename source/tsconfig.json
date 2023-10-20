@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "lib": [
+            "ESNext"
+        ],
+        "allowJs": true,
+        "checkJs": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "outDir": "../dist",
+        "downlevelIteration": true,
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "baseUrl": "./",
+        "paths": {},
+        "skipDefaultLibCheck": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true
+    }
+}
