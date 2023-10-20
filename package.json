@@ -27,6 +27,7 @@
   "homepage": "https://github.com/euberdeveloper/countdown-bot#readme",
   "dependencies": {
     "dotenv": "^16.3.1",
+    "euberlog": "^2.5.1",
     "grammy": "^1.19.2"
   },
   "devDependencies": {

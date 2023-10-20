@@ -1,10 +1,16 @@
+import { Bot } from 'grammy';
+import logger from 'euberlog';
+
 import { addCommand, setCommandsHelp } from './commands/index.js';
 import config from './config/index.js';
-import { Bot } from 'grammy';
 
 async function main() {
+    logger.info('Setting bot up');
+
+    logger.debug('Creating bot');
     const bot = new Bot(config.BOT_TOKEN);
 
+    logger.debug('Setting commands up');
     addCommand(bot, {
         command: 'start',
         description: 'Start the bot',
@@ -17,9 +23,10 @@ async function main() {
     });
     await setCommandsHelp(bot);
     
+    logger.debug('Starting bot up');
     bot.start({
-        onStart() {
-            console.log("Bot started!");
+        onStart(botInfo) {
+            logger.success('Bot started', botInfo);
         }
     });
 }
