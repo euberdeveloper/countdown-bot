@@ -1,12 +1,13 @@
 import { Bot } from "grammy";
 import logger from "euberlog";
 
+import { CountDownContext } from "../types/index.js";
 import { EuberBotCommand } from "./types.js";
 import { getCommandsHelp } from "./utils.js";
 
 const commands: EuberBotCommand[] = [];
 
-export function addCommand(bot: Bot, command: EuberBotCommand) {
+export function addCommand(bot: Bot<CountDownContext>, command: EuberBotCommand) {
     logger.debug('Adding command', command.command);
     commands.push(command);
     bot.command(command.command, command.handler);
