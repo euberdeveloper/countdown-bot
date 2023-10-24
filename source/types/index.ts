@@ -2,7 +2,7 @@ import { Context, SessionFlavor } from "grammy";
 
 export interface SessionData {
     countdownActive: boolean;
-    intervalId: NodeJS.Timeout | null;
+    interval: NodeJS.Timeout | null;
     timeRemaining: number;
 }
 

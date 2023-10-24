@@ -2,8 +2,10 @@ import { Bot, session } from 'grammy';
 import logger from 'euberlog';
 
 import { addCommand, setCommandsHelp } from './commands/index.js';
+import { initialSessionData, resetSession } from './session/index.js';
+import type { CountDownContext } from './types/index.js';
+
 import config from './config/index.js';
-import { CountDownContext, SessionData } from 'types/index.js';
 
 async function main() {
     logger.info('Setting bot up');
@@ -12,14 +14,8 @@ async function main() {
     const bot = new Bot<CountDownContext>(config.BOT_TOKEN);
 
     logger.debug('Initializing session');
-    function initial(): SessionData {
-        return {
-            countdownActive: false,
-            intervalId: null,
-            timeRemaining: 0
-        };
-    }
-    bot.use(session({ initial }));
+    
+    bot.use(session({ initial: initialSessionData }));
 
     logger.debug('Setting commands up');
     addCommand(bot, {
@@ -56,12 +52,10 @@ async function main() {
 
             ctx.session.countdownActive = true;
             ctx.session.timeRemaining = minutes;
-            ctx.session.intervalId = setInterval(async () => {
+            ctx.session.interval = setInterval(async () => {
                 ctx.session.timeRemaining--;
                 if (ctx.session.timeRemaining <= 0) {
-                    clearInterval(ctx.session.intervalId);
-                    ctx.session.countdownActive = false;
-                    ctx.session.intervalId = null;
+                    resetSession(ctx.session);
                     await ctx.reply('Countdown finished!');
                 }
                 else {
@@ -74,15 +68,13 @@ async function main() {
         command: 'stop',
         description: 'Stops the countdown',
         handler: async ctx => {
-            if (!ctx.session.countdownActive) {
+            const wasActive = resetSession(ctx.session);
+            if (!wasActive) {
                 await ctx.reply('There is no countdown active');
-                return;
             }
-
-            clearInterval(ctx.session.intervalId);
-            ctx.session.countdownActive = false;
-            ctx.session.intervalId = null;
-            await ctx.reply('Countdown stopped!');
+            else {
+                await ctx.reply('Countdown stopped!');
+            }
         }
     });
     await setCommandsHelp(bot);
