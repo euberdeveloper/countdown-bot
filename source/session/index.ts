@@ -1,17 +1,8 @@
-import { SessionData } from "types/index.js"
+import { defaultCountdownInfo } from "../countdown/index.js";
+import { SessionData } from "../types/index.js"
 
 export const initialSessionData = () =>
     ({
-        countdownActive: false,
-        interval: null,
-        timeRemaining: 0
+       countdown: defaultCountdownInfo()
     }) as SessionData;
 
-export function resetSession(sessionData: SessionData): boolean {
-    const wasActive = sessionData.countdownActive;
-    clearInterval(sessionData.interval);
-    sessionData.countdownActive = false;
-    sessionData.interval = null;
-    sessionData.timeRemaining = 0;
-    return wasActive;
-}

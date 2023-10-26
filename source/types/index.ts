@@ -1,9 +1,8 @@
 import { Context, SessionFlavor } from "grammy";
+import { CountdownInfo } from "../countdown/index.js";
 
 export interface SessionData {
-    countdownActive: boolean;
-    interval: NodeJS.Timeout | null;
-    timeRemaining: number;
+    countdown: CountdownInfo;
 }
 
 export type CountDownContext = Context & SessionFlavor<SessionData>;

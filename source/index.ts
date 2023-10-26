@@ -2,9 +2,9 @@ import { Bot, session } from 'grammy';
 import logger from 'euberlog';
 
 import { addCommand, setCommandsHelp } from './commands/index.js';
-import { initialSessionData, resetSession } from './session/index.js';
-import { parseTime } from './countdown/index.js';
-import { CountdownBotTimeIsNaNError, CountdownBotTimeIsNegativeError, CountdownBotTimeNotSpecifiedError } from './errors/index.js';
+import { initialSessionData } from './session/index.js';
+import * as countdown from './countdown/index.js';
+import { CountDownAlreadyActiveError, TimeIsNaNError, TimeIsNegativeError, TimeNotSpecifiedError } from './errors/index.js';
 import type { CountDownContext } from './types/index.js';
 
 import config from './config/index.js';
@@ -35,39 +35,28 @@ async function main() {
         description: 'Starts a countdown',
         handler: async ctx => {
             try {
-                const minutes = parseTime(ctx.match);
-
-                if (ctx.session.countdownActive) {
-                    await ctx.reply('There is already a countdown active');
-                    return;
-                }
-
-                ctx.session.countdownActive = true;
-                ctx.session.timeRemaining = minutes;
-                ctx.session.interval = setInterval(async () => {
-                    ctx.session.timeRemaining--;
-                    if (ctx.session.timeRemaining <= 0) {
-                        resetSession(ctx.session);
-                        await ctx.reply('Countdown finished!');
-                    }
-                    else {
-                        await ctx.reply(`${ctx.session.timeRemaining} minutes`);
-                    }
-                }, 1000);
-
-                
+                const timeText = ctx.match;
+                countdown.setUp(ctx.session.countdown, timeText, async () => {
+                    await ctx.reply(`${ctx.session.countdown.timeRemaining} minutes`);
+                }, async () => {
+                    await ctx.reply('Countdown finished!');
+                });
             }
             catch (error) {
-                if (error instanceof CountdownBotTimeNotSpecifiedError) {
+                if (error instanceof TimeNotSpecifiedError) {
                     await ctx.reply('You have to write the number of minutes after the command (e.g. /countdown 10).');
                     return;
                 }
-                else if (error instanceof CountdownBotTimeIsNaNError) {
+                else if (error instanceof TimeIsNaNError) {
                     await ctx.reply('The number of minutes must be a number.');
                     return;
                 }
-                else if (error instanceof CountdownBotTimeIsNegativeError) {
+                else if (error instanceof TimeIsNegativeError) {
                     await ctx.reply('The number of minutes must be greater than 0.');
+                    return;
+                }
+                else if (error instanceof CountDownAlreadyActiveError) {
+                    await ctx.reply('There is already a countdown active');
                     return;
                 }
                 else {
@@ -82,7 +71,7 @@ async function main() {
         command: 'stop',
         description: 'Stops the countdown',
         handler: async ctx => {
-            const wasActive = resetSession(ctx.session);
+            const wasActive = countdown.reset(ctx.session.countdown);
             if (!wasActive) {
                 await ctx.reply('There is no countdown active');
             }

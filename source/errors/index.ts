@@ -5,30 +5,37 @@ export class CountdownBotError extends Error {
     }
 }
 
-export class CountdownBotInvalidTimeError extends CountdownBotError {
+export class InvalidTimeError extends CountdownBotError {
     constructor(public time: string, message = 'Invalid time: ' + time) {
         super(message);
-        this.name = 'CountdownBotInvalidTimeError';
+        this.name = 'InvalidTimeError';
     }
 }
 
-export class CountdownBotTimeNotSpecifiedError extends CountdownBotInvalidTimeError {
+export class TimeNotSpecifiedError extends InvalidTimeError {
     constructor(public time: string, message = 'Time not specified: ' + time) {
         super(message, time);
-        this.name = 'CountdownBotTimeNotSpecifiedError';
+        this.name = 'TimeNotSpecifiedError';
     }
 }
 
-export class CountdownBotTimeIsNaNError extends CountdownBotInvalidTimeError {
+export class TimeIsNaNError extends InvalidTimeError {
     constructor(public time: string, message = 'Time is not a number: ' + time) {
         super(message, time);
-        this.name = 'CountdownBotTimeIsNaNError';
+        this.name = 'TimeIsNaNError';
     }
 }
 
-export class CountdownBotTimeIsNegativeError extends CountdownBotInvalidTimeError {
+export class TimeIsNegativeError extends InvalidTimeError {
     constructor(public time: string, message = 'Time is negative: ' + time) {
         super(message, time);
-        this.name = 'CountdownBotTimeIsNaNError';
+        this.name = 'TimeIsNegativeError';
+    }
+}
+
+export class CountDownAlreadyActiveError extends CountdownBotError {
+    constructor(message = 'Countdown already active') {
+        super(message);
+        this.name = 'CountDownAlreadyActiveError';
     }
 }
