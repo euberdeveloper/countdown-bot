@@ -1,4 +1,9 @@
-import { CountDownAlreadyActiveError, TimeIsNaNError, TimeIsNegativeError, TimeNotSpecifiedError } from "../errors/index.js";
+import {
+    CountDownAlreadyActiveError,
+    TimeIsNaNError,
+    TimeIsNegativeError,
+    TimeNotSpecifiedError
+} from '../errors/index.js';
 
 export class CountdownInfo {
     countdownActive: boolean;
@@ -40,7 +45,12 @@ export function parseTime(time: string) {
     return minutes;
 }
 
-export function setUp(info: CountdownInfo, timeText: string, onUpdate: () => Promise<void>, onEnd: () => Promise<void>) {
+export function setUp(
+    info: CountdownInfo,
+    timeText: string,
+    onUpdate: () => Promise<void>,
+    onEnd: () => Promise<void>
+) {
     if (info.countdownActive) {
         throw new CountDownAlreadyActiveError();
     }
@@ -52,8 +62,7 @@ export function setUp(info: CountdownInfo, timeText: string, onUpdate: () => Pro
         if (info.timeRemaining <= 0) {
             reset(info);
             onEnd();
-        }
-        else {
+        } else {
             onUpdate();
         }
     }, 1000);

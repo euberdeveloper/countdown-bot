@@ -1,6 +1,6 @@
-import { BotCommand } from "grammy/types";
-import { EuberBotCommand } from "./types.js";
-import { Bot } from "grammy";
+import { BotCommand } from 'grammy/types';
+import { EuberBotCommand } from './types.js';
+import { Bot } from 'grammy';
 
 export function getCommandsHelp(commands: EuberBotCommand[]): BotCommand[] {
     return commands

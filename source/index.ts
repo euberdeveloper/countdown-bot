@@ -4,7 +4,12 @@ import logger from 'euberlog';
 import { addCommand, setCommandsHelp } from './commands/index.js';
 import { initialSessionData } from './session/index.js';
 import * as countdown from './countdown/index.js';
-import { CountDownAlreadyActiveError, TimeIsNaNError, TimeIsNegativeError, TimeNotSpecifiedError } from './errors/index.js';
+import {
+    CountDownAlreadyActiveError,
+    TimeIsNaNError,
+    TimeIsNegativeError,
+    TimeNotSpecifiedError
+} from './errors/index.js';
 import type { CountDownContext } from './types/index.js';
 
 import config from './config/index.js';
@@ -23,12 +28,12 @@ async function main() {
     addCommand(bot, {
         command: 'start',
         description: 'Start the bot',
-        handler: ctx => ctx.reply('Welcome!')
+        handler: async ctx => ctx.reply('Welcome!')
     });
     addCommand(bot, {
         command: 'help',
         description: 'Show help message',
-        handler: ctx => ctx.reply('Help message')
+        handler: async ctx => ctx.reply('Help message')
     });
     addCommand(bot, {
         command: 'countdown',
@@ -36,30 +41,30 @@ async function main() {
         handler: async ctx => {
             try {
                 const timeText = ctx.match;
-                countdown.setUp(ctx.session.countdown, timeText, async () => {
-                    await ctx.reply(`${ctx.session.countdown.timeRemaining} minutes`);
-                }, async () => {
-                    await ctx.reply('Countdown finished!');
-                });
-            }
-            catch (error) {
+                countdown.setUp(
+                    ctx.session.countdown,
+                    timeText,
+                    async () => {
+                        await ctx.reply(`${ctx.session.countdown.timeRemaining} minutes`);
+                    },
+                    async () => {
+                        await ctx.reply('Countdown finished!');
+                    }
+                );
+            } catch (error) {
                 if (error instanceof TimeNotSpecifiedError) {
                     await ctx.reply('You have to write the number of minutes after the command (e.g. /countdown 10).');
                     return;
-                }
-                else if (error instanceof TimeIsNaNError) {
+                } else if (error instanceof TimeIsNaNError) {
                     await ctx.reply('The number of minutes must be a number.');
                     return;
-                }
-                else if (error instanceof TimeIsNegativeError) {
+                } else if (error instanceof TimeIsNegativeError) {
                     await ctx.reply('The number of minutes must be greater than 0.');
                     return;
-                }
-                else if (error instanceof CountDownAlreadyActiveError) {
+                } else if (error instanceof CountDownAlreadyActiveError) {
                     await ctx.reply('There is already a countdown active');
                     return;
-                }
-                else {
+                } else {
                     await ctx.reply('An error ocurred.');
                     logger.error(ctx.message.text, error);
                     return;
@@ -72,12 +77,7 @@ async function main() {
         description: 'Stops the countdown',
         handler: async ctx => {
             const wasActive = countdown.reset(ctx.session.countdown);
-            if (!wasActive) {
-                await ctx.reply('There is no countdown active');
-            }
-            else {
-                await ctx.reply('Countdown stopped!');
-            }
+            await (!wasActive ? ctx.reply('There is no countdown active') : ctx.reply('Countdown stopped!'));
         }
     });
     await setCommandsHelp(bot);
