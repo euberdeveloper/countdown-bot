@@ -1,3 +1,4 @@
+import logger from 'euberlog';
 import {
     CountDownAlreadyActiveError,
     TimeIsNaNError,
@@ -5,16 +6,16 @@ import {
     TimeNotSpecifiedError
 } from '../errors/index.js';
 
-export class CountdownInfo {
+export interface CountdownInfo {
     countdownActive: boolean;
-    interval: NodeJS.Timeout | null;
+    interval: NodeJS.Timeout | undefined;
     timeRemaining: number;
 }
 
 export function defaultCountdownInfo(): CountdownInfo {
     return {
         countdownActive: false,
-        interval: null,
+        interval: undefined,
         timeRemaining: 0
     };
 }
@@ -23,19 +24,19 @@ export function reset(info: CountdownInfo): boolean {
     const wasActive = info.countdownActive;
     clearInterval(info.interval);
     info.countdownActive = false;
-    info.interval = null;
+    info.interval = undefined;
     info.timeRemaining = 0;
     return wasActive;
 }
 
-export function parseTime(time: string) {
+export function parseTime(time: string): number {
     if (!time) {
         throw new TimeNotSpecifiedError(time);
     }
 
     const minutes = +time;
 
-    if (isNaN(minutes)) {
+    if (Number.isNaN(minutes)) {
         throw new TimeIsNaNError(time);
     }
     if (minutes < 1) {
@@ -50,7 +51,7 @@ export function setUp(
     timeText: string,
     onUpdate: () => Promise<void>,
     onEnd: () => Promise<void>
-) {
+): void {
     if (info.countdownActive) {
         throw new CountDownAlreadyActiveError();
     }
@@ -61,9 +62,9 @@ export function setUp(
         info.timeRemaining--;
         if (info.timeRemaining <= 0) {
             reset(info);
-            onEnd();
+            onEnd().catch(error => logger.error('Error while ending countdown', error));
         } else {
-            onUpdate();
+            onUpdate().catch(error => logger.error('Error while updating countdown', error));
         }
     }, 1000);
 }

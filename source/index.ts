@@ -83,10 +83,10 @@ async function main() {
     await setCommandsHelp(bot);
 
     logger.debug('Starting bot up');
-    bot.start({
+    await bot.start({
         onStart(botInfo) {
             logger.success('Bot started', botInfo);
         }
     });
 }
-main();
+void main();
