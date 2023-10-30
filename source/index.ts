@@ -11,6 +11,7 @@ import config from '@/config/index.js';
 import { botAdmin } from '@/middlewares/botAdmin.js';
 import { runnerSequentialize } from '@/middlewares/sequentialize.js';
 import { run } from '@grammyjs/runner';
+import { errorHandler } from './middlewares/errorCatcher.js';
 
 async function main() {
     logger.info('Setting bot up');
@@ -85,6 +86,7 @@ async function main() {
     });
     await setCommandsHelp(bot);
 
+    bot.catch(errorHandler);
     logger.debug('Starting bot up');
     const handle = run(bot);
     await bot.init();
