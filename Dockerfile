@@ -4,6 +4,6 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run transpile && \
-    rm -r source scripts node_modules
+    rm -rf source scripts node_modules
 RUN npm ci --only=prod
 CMD ["npm", "start"]
