@@ -8,6 +8,7 @@ import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedEr
 import type { CountDownContext } from './types/index.js';
 
 import config from './config/index.js';
+import { botAdmin } from './middlewares/botAdmin.js';
 
 async function main() {
     logger.info('Setting bot up');
@@ -15,8 +16,10 @@ async function main() {
     logger.debug('Creating bot');
     const bot = new Bot<CountDownContext>(config.BOT_TOKEN);
 
-    logger.debug('Initializing session');
+    logger.debug('Adding middlewares');
+    bot.use(botAdmin(config.BOT_ADMIN_ID));
 
+    logger.debug('Initializing session');
     bot.use(session({ initial: initialSessionData }));
 
     logger.debug('Setting commands up');
