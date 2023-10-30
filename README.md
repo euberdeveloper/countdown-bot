@@ -1,2 +1,2 @@
-# countdown-bot
+# the-countdown-bot
 A telegram bot for countdowns!
