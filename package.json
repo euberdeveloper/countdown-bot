@@ -33,6 +33,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@grammyjs/runner": "^2.0.3",
     "dotenv": "^16.3.1",
     "esm-module-alias": "^2.0.3",
     "euberlog": "^2.5.1",

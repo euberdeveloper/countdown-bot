@@ -1,14 +1,16 @@
 import { Bot, session } from 'grammy';
 import logger from 'euberlog';
 
-import { addCommand, setCommandsHelp } from './commands/index.js';
-import { initialSessionData } from './session/index.js';
-import * as countdown from './countdown/index.js';
-import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from './errors/index.js';
-import type { CountDownContext } from './types/index.js';
+import { addCommand, setCommandsHelp } from '@/commands/index.js';
+import { initialSessionData } from '@/session/index.js';
+import * as countdown from '@/countdown/index.js';
+import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from '@/errors/index.js';
+import type { CountDownContext } from '@/types/index.js';
 
-import config from './config/index.js';
-import { botAdmin } from './middlewares/botAdmin.js';
+import config from '@/config/index.js';
+import { botAdmin } from '@/middlewares/botAdmin.js';
+import { runnerSequentialize } from '@/middlewares/sequentialize.js';
+import { run } from '@grammyjs/runner';
 
 async function main() {
     logger.info('Setting bot up');
@@ -17,6 +19,7 @@ async function main() {
     const bot = new Bot<CountDownContext>(config.BOT_TOKEN);
 
     logger.debug('Adding middlewares');
+    bot.use(runnerSequentialize());
     bot.use(botAdmin(config.BOT_ADMIN_ID));
 
     logger.debug('Initializing session');
@@ -83,10 +86,10 @@ async function main() {
     await setCommandsHelp(bot);
 
     logger.debug('Starting bot up');
-    await bot.start({
-        onStart(botInfo) {
-            logger.success('Bot started', botInfo);
-        }
-    });
+    const handle = run(bot);
+    await bot.init();
+    logger.success('Bot started', bot.botInfo);
+    await handle.task();
+    logger.success('Bot finished gracefully');
 }
 void main();
