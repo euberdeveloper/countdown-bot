@@ -16,10 +16,14 @@
         "noImplicitAny": false,
         "strictNullChecks": true,
         "esModuleInterop": true,
-        "baseUrl": "./",
-        "paths": {},
         "skipDefaultLibCheck": true,
         "skipLibCheck": true,
-        "resolveJsonModule": true
-    }
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./*"
+            ]
+        }
+    },
 }

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "transpile": "tsc -p source",
-    "start": "node dist/index.js",
+    "start": "node --loader esm-module-alias/loader dist/index.js",
     "serve": "npm run transpile && npm start",
     "lint": "eslint source --ext ts --format codeframe",
     "lint:fix": "eslint source --ext ts --format codeframe --fix"
@@ -34,7 +34,11 @@
   },
   "dependencies": {
     "dotenv": "^16.3.1",
+    "esm-module-alias": "^2.0.3",
     "euberlog": "^2.5.1",
     "grammy": "^1.19.2"
+  },
+  "aliases": {
+    "@": "./dist"
   }
 }

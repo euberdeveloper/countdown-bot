@@ -4,7 +4,7 @@ import {
     TimeIsNaNError,
     TimeIsNegativeError,
     TimeNotSpecifiedError
-} from '../errors/index.js';
+} from '@/errors/index.js';
 
 export interface CountdownInfo {
     countdownActive: boolean;

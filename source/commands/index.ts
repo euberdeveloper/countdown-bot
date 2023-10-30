@@ -1,7 +1,7 @@
 import { Bot } from 'grammy';
 import logger from 'euberlog';
 
-import { CountDownContext } from '../types/index.js';
+import { CountDownContext } from '@/types/index.js';
 import { EuberBotCommand } from './types.js';
 import { getCommandsHelp } from './utils.js';
 
