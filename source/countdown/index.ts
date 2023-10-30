@@ -1,22 +1,13 @@
 import logger from 'euberlog';
-import {
-    CountDownAlreadyActiveError,
-    TimeIsNaNError,
-    TimeIsNegativeError,
-    TimeNotSpecifiedError
-} from '@/errors/index.js';
-
-export interface CountdownInfo {
-    countdownActive: boolean;
-    interval: NodeJS.Timeout | undefined;
-    timeRemaining: number;
-}
+import { InvalidTimeFormatError, InvalidTimeUnitError, TimeNotSpecifiedError } from '@/errors/index.js';
+import { CountdownInfo, CountdownQuery, isTimeUnit, TimeUnit } from './types.js';
 
 export function defaultCountdownInfo(): CountdownInfo {
     return {
         countdownActive: false,
         interval: undefined,
-        timeRemaining: 0
+        timeRemaining: 0,
+        timeUnit: 'm'
     };
 }
 
@@ -29,42 +20,58 @@ export function reset(info: CountdownInfo): boolean {
     return wasActive;
 }
 
-export function parseTime(time: string): number {
+export function parseTime(time: string): CountdownQuery {
     if (!time) {
         throw new TimeNotSpecifiedError(time);
     }
 
-    const minutes = +time;
-
-    if (Number.isNaN(minutes)) {
-        throw new TimeIsNaNError(time);
+    const timeRegexp = /^(?<timeAmount>\d+)(?<timeUnit>[dhms])?$/;
+    const match = timeRegexp.exec(time);
+    if (!match?.groups) {
+        throw new InvalidTimeFormatError(time);
     }
-    if (minutes < 1) {
-        throw new TimeIsNegativeError(time);
+    const { timeAmount, timeUnit = 'm' } = match.groups;
+    if (!isTimeUnit(timeUnit)) {
+        throw new InvalidTimeUnitError(time, timeUnit);
     }
 
-    return minutes;
+    return {
+        timeAmount: +timeAmount,
+        timeUnit: timeUnit
+    };
 }
 
-export function setUp(
-    info: CountdownInfo,
-    timeText: string,
-    onUpdate: () => Promise<void>,
-    onEnd: () => Promise<void>
-): void {
-    if (info.countdownActive) {
-        throw new CountDownAlreadyActiveError();
-    }
-
-    info.countdownActive = true;
-    info.timeRemaining = parseTime(timeText);
-    info.interval = setInterval(() => {
-        info.timeRemaining--;
-        if (info.timeRemaining <= 0) {
-            reset(info);
-            onEnd().catch(error => logger.error('Error while ending countdown', error));
-        } else {
-            onUpdate().catch(error => logger.error('Error while updating countdown', error));
+export function timeUnitToMilliseconds(timeUnit: TimeUnit): number {
+    function timeUnitToSeconds(timeUnit: TimeUnit): number {
+        switch (timeUnit) {
+            case 'd':
+                return 24 * 60 * 60;
+            case 'h':
+                return 60 * 60;
+            case 'm':
+                return 60;
+            case 's':
+                return 1;
         }
-    }, 1000);
+    }
+    return timeUnitToSeconds(timeUnit) * 1000;
+}
+
+export function setUp(timeText: string, onUpdate: () => Promise<void>, onEnd: () => Promise<void>): CountdownInfo {
+    const countdownQuery = parseTime(timeText);
+    const info = {
+        countdownActive: true,
+        interval: setInterval(() => {
+            info.timeRemaining--;
+            if (info.timeRemaining <= 0) {
+                reset(info);
+                onEnd().catch(error => logger.error('Error while ending countdown', error));
+            } else {
+                onUpdate().catch(error => logger.error('Error while updating countdown', error));
+            }
+        }, timeUnitToMilliseconds(countdownQuery.timeUnit)),
+        timeRemaining: countdownQuery.timeAmount,
+        timeUnit: countdownQuery.timeUnit
+    };
+    return info;
 }

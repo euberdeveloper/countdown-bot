@@ -25,23 +25,24 @@ export class TimeNotSpecifiedError extends InvalidTimeError {
     }
 }
 
-export class TimeIsNaNError extends InvalidTimeError {
+export class InvalidTimeFormatError extends InvalidTimeError {
     constructor(
         public time: string,
-        message = 'Time is not a number: ' + time
+        message = 'Time has invalid format: ' + time
     ) {
         super(message, time);
-        this.name = 'TimeIsNaNError';
+        this.name = 'InvalidTimeFormatError';
     }
 }
 
-export class TimeIsNegativeError extends InvalidTimeError {
+export class InvalidTimeUnitError extends InvalidTimeFormatError {
     constructor(
         public time: string,
-        message = 'Time is negative: ' + time
+        public unit: string,
+        message = 'Time has invalid time unit: ' + unit
     ) {
         super(message, time);
-        this.name = 'TimeIsNegativeError';
+        this.name = 'InvalidTimeUnitError';
     }
 }
 

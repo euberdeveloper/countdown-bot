@@ -4,12 +4,7 @@ import logger from 'euberlog';
 import { addCommand, setCommandsHelp } from './commands/index.js';
 import { initialSessionData } from './session/index.js';
 import * as countdown from './countdown/index.js';
-import {
-    CountDownAlreadyActiveError,
-    TimeIsNaNError,
-    TimeIsNegativeError,
-    TimeNotSpecifiedError
-} from './errors/index.js';
+import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from './errors/index.js';
 import type { CountDownContext } from './types/index.js';
 
 import config from './config/index.js';
@@ -41,8 +36,11 @@ async function main() {
         handler: async ctx => {
             try {
                 const timeText = ctx.match;
-                countdown.setUp(
-                    ctx.session.countdown,
+                if (ctx.session.countdown.countdownActive) {
+                    throw new CountDownAlreadyActiveError();
+                }
+
+                ctx.session.countdown = countdown.setUp(
                     timeText,
                     async () => {
                         await ctx.reply(`${ctx.session.countdown.timeRemaining} minutes`);
@@ -55,11 +53,10 @@ async function main() {
                 if (error instanceof TimeNotSpecifiedError) {
                     await ctx.reply('You have to write the number of minutes after the command (e.g. /countdown 10).');
                     return;
-                } else if (error instanceof TimeIsNaNError) {
-                    await ctx.reply('The number of minutes must be a number.');
-                    return;
-                } else if (error instanceof TimeIsNegativeError) {
-                    await ctx.reply('The number of minutes must be greater than 0.');
+                } else if (error instanceof InvalidTimeFormatError) {
+                    await ctx.reply(
+                        'The format of the time is invalid. It has to be a number followed by a unit (e.g. 10m). The units are: d, h, m, s.'
+                    );
                     return;
                 } else if (error instanceof CountDownAlreadyActiveError) {
                     await ctx.reply('There is already a countdown active');

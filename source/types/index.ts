@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { CountdownInfo } from '@/countdown/index.js';
+import { CountdownInfo } from '@/countdown/types.js';
 
 export interface SessionData {
     countdown: CountdownInfo;
