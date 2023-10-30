@@ -27,14 +27,14 @@
     "url": "https://github.com/euberdeveloper/countdown-bot/issues"
   },
   "homepage": "https://github.com/euberdeveloper/countdown-bot#readme",
+  "devDependencies": {
+    "@euberdeveloper/eslint-plugin": "^2.6.0",
+    "@types/node": "^20.8.9",
+    "typescript": "^5.2.2"
+  },
   "dependencies": {
     "dotenv": "^16.3.1",
     "euberlog": "^2.5.1",
     "grammy": "^1.19.2"
-  },
-  "devDependencies": {
-    "@euberdeveloper/eslint-plugin": "^2.5.1",
-    "@types/node": "^20.8.7",
-    "typescript": "^5.2.2"
   }
 }
