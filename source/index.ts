@@ -66,7 +66,7 @@ async function main() {
                     return;
                 } else {
                     await ctx.reply('An error ocurred.');
-                    logger.error(ctx.message.text, error);
+                    logger.error(ctx.message!.text, error);
                     return;
                 }
             }
