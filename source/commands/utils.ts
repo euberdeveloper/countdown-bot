@@ -4,7 +4,7 @@ import { Bot } from 'grammy';
 
 export function getCommandsHelp(commands: EuberBotCommand[]): BotCommand[] {
     return commands
-        .filter(command => command.hidden)
+        .filter(command => !command.hidden)
         .map<BotCommand>(({ command, description }) => ({ command, description }));
 }
 
