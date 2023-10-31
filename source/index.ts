@@ -51,7 +51,7 @@ async function main() {
                 session.countdown = countdown.setUp(
                     timeText,
                     async () => {
-                        await ctx.reply(`${session.countdown.timeRemaining} minutes`);
+                        await ctx.reply(`${session.countdown.timeRemaining} remaining`);
                     },
                     async () => {
                         await ctx.reply('Countdown finished!');
@@ -59,7 +59,7 @@ async function main() {
                 );
             } catch (error) {
                 if (error instanceof TimeNotSpecifiedError) {
-                    await ctx.reply('You have to write the number of minutes after the command (e.g. /countdown 10).');
+                    await ctx.reply('You have to write the counter time after the command (e.g. /countdown 10).');
                     return;
                 } else if (error instanceof InvalidTimeFormatError) {
                     await ctx.reply(
