@@ -43,14 +43,15 @@ async function main() {
         handler: async ctx => {
             try {
                 const timeText = ctx.match;
-                if (ctx.session.countdown.countdownActive) {
+                const session = await ctx.session;
+                if (session.countdown.countdownActive) {
                     throw new CountDownAlreadyActiveError();
                 }
 
-                ctx.session.countdown = countdown.setUp(
+                session.countdown = countdown.setUp(
                     timeText,
                     async () => {
-                        await ctx.reply(`${ctx.session.countdown.timeRemaining} minutes`);
+                        await ctx.reply(`${session.countdown.timeRemaining} minutes`);
                     },
                     async () => {
                         await ctx.reply('Countdown finished!');
@@ -80,7 +81,8 @@ async function main() {
         command: 'stop',
         description: 'Stops the countdown',
         handler: async ctx => {
-            const wasActive = countdown.reset(ctx.session.countdown);
+            const session = await ctx.session;
+            const wasActive = countdown.reset(session.countdown);
             await (!wasActive ? ctx.reply('There is no countdown active') : ctx.reply('Countdown stopped!'));
         }
     });
@@ -88,10 +90,23 @@ async function main() {
 
     bot.catch(errorHandler);
     logger.debug('Starting bot up');
-    const handle = run(bot);
+
+    const runner = run(bot);
+
+    const stopRunner = async () => {
+        runner.isRunning() && (await runner.stop());
+    };
+    process.once('SIGINT', () => {
+        stopRunner().catch(error => logger.error('Error while stopping bot', error));
+    });
+    process.once('SIGTERM', () => {
+        stopRunner().catch(error => logger.error('Error while stopping bot', error));
+    });
+
     await bot.init();
     logger.success('Bot started', bot.botInfo);
-    await handle.task();
+
+    await runner.task();
     logger.success('Bot finished gracefully');
 }
 void main();
