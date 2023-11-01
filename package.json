@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@grammyjs/runner": "^2.0.3",
+    "@grammyjs/storage-free": "^2.4.0",
     "dotenv": "^16.3.1",
     "esm-module-alias": "^2.0.3",
     "euberlog": "^2.5.1",
