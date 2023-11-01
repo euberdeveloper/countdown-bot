@@ -1,21 +1,23 @@
 import logger from 'euberlog';
 import { InvalidTimeFormatError, InvalidTimeUnitError, TimeNotSpecifiedError } from '@/errors/index.js';
-import { CountdownInfo, CountdownQuery, isTimeUnit, TimeUnit } from './types.js';
+import { CountdownInfo, CountdownInterval, CountdownQuery, isTimeUnit, TimeUnit } from './types.js';
 
 export function defaultCountdownInfo(): CountdownInfo {
     return {
         countdownActive: false,
-        interval: undefined,
         timeRemaining: 0,
         timeUnit: 'm'
     };
 }
+export function defaultCountdownInterval(): CountdownInterval {
+    return undefined;
+}
 
-export function reset(info: CountdownInfo): boolean {
+export function reset(info: CountdownInfo, interval: CountdownInterval): boolean {
     const wasActive = info.countdownActive;
-    clearInterval(info.interval);
+    clearInterval(interval);
     info.countdownActive = false;
-    info.interval = undefined;
+    interval = undefined;
     info.timeRemaining = 0;
     return wasActive;
 }
@@ -57,21 +59,25 @@ export function timeUnitToMilliseconds(timeUnit: TimeUnit): number {
     return timeUnitToSeconds(timeUnit) * 1000;
 }
 
-export function setUp(timeText: string, onUpdate: () => Promise<void>, onEnd: () => Promise<void>): CountdownInfo {
+export function setUp(
+    timeText: string,
+    onUpdate: () => Promise<void>,
+    onEnd: () => Promise<void>
+): { countdown: CountdownInfo; interval: CountdownInterval } {
     const countdownQuery = parseTime(timeText);
-    const info = {
+    const countdown: CountdownInfo = {
         countdownActive: true,
-        interval: setInterval(() => {
-            info.timeRemaining--;
-            if (info.timeRemaining <= 0) {
-                reset(info);
-                onEnd().catch(error => logger.error('Error while ending countdown', error));
-            } else {
-                onUpdate().catch(error => logger.error('Error while updating countdown', error));
-            }
-        }, timeUnitToMilliseconds(countdownQuery.timeUnit)),
         timeRemaining: countdownQuery.timeAmount,
         timeUnit: countdownQuery.timeUnit
     };
-    return info;
+    const interval = setInterval(() => {
+        countdown.timeRemaining--;
+        if (countdown.timeRemaining <= 0) {
+            reset(countdown, interval);
+            onEnd().catch(error => logger.error('Error while ending countdown', error));
+        } else {
+            onUpdate().catch(error => logger.error('Error while updating countdown', error));
+        }
+    }, timeUnitToMilliseconds(countdownQuery.timeUnit));
+    return { countdown, interval };
 }

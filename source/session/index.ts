@@ -1,10 +1,12 @@
-import { defaultCountdownInfo } from '@/countdown/index.js';
-import { CountdownInfo } from '@/countdown/types.js';
+import { defaultCountdownInfo, defaultCountdownInterval } from '@/countdown/index.js';
+import { CountdownInfo, CountdownInterval } from '@/countdown/types.js';
 
+export type CountdownSessionData = CountdownInfo;
+export type IntervalSessionData = CountdownInterval;
 export interface SessionData {
-    countdown: CountdownInfo;
+    countdown: CountdownSessionData;
+    interval: IntervalSessionData;
 }
 
-export const initialSessionData: () => SessionData = () => ({
-    countdown: defaultCountdownInfo()
-});
+export const initialCountdownSessionData: () => CountdownSessionData = defaultCountdownInfo;
+export const initialIntervalSessionData: () => IntervalSessionData = defaultCountdownInterval;

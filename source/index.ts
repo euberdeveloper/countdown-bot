@@ -2,7 +2,7 @@ import { Bot, session } from 'grammy';
 import logger from 'euberlog';
 
 import { addCommand, setCommandsHelp } from '@/commands/index.js';
-import { initialSessionData } from '@/session/index.js';
+import {} from '@/session/index.js';
 import * as countdown from '@/countdown/index.js';
 import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from '@/errors/index.js';
 import type { CountDownContext } from '@/types/index.js';
@@ -24,7 +24,13 @@ async function main() {
     bot.use(botAdmin(config.BOT_ADMIN_ID));
 
     logger.debug('Initializing session');
-    bot.use(session({ initial: initialSessionData }));
+    bot.use(
+        session({
+            type: 'multi',
+            countdown: { initial: countdown.defaultCountdownInfo },
+            interval: { initial: countdown.defaultCountdownInterval }
+        })
+    );
 
     logger.debug('Setting commands up');
     addCommand(bot, {
@@ -48,7 +54,7 @@ async function main() {
                     throw new CountDownAlreadyActiveError();
                 }
 
-                session.countdown = countdown.setUp(
+                const setupResult = countdown.setUp(
                     timeText,
                     async () => {
                         await ctx.reply(`${session.countdown.timeRemaining} remaining`);
@@ -57,6 +63,8 @@ async function main() {
                         await ctx.reply('Countdown finished!');
                     }
                 );
+                session.countdown = setupResult.countdown;
+                session.interval = setupResult.interval;
             } catch (error) {
                 if (error instanceof TimeNotSpecifiedError) {
                     await ctx.reply('You have to write the counter time after the command (e.g. /countdown 10).');
@@ -82,7 +90,7 @@ async function main() {
         description: 'Stops the countdown',
         handler: async ctx => {
             const session = await ctx.session;
-            const wasActive = countdown.reset(session.countdown);
+            const wasActive = countdown.reset(session.countdown, session.interval);
             await (!wasActive ? ctx.reply('There is no countdown active') : ctx.reply('Countdown stopped!'));
         }
     });
