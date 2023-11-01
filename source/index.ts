@@ -1,18 +1,21 @@
 import { Bot, session } from 'grammy';
 import { freeStorage } from '@grammyjs/storage-free';
+import { run } from '@grammyjs/runner';
 import logger from 'euberlog';
 
+import * as countdown from '@/countdown/index.js';
 import { addCommand, setCommandsHelp } from '@/commands/index.js';
 import { initialCountdownSessionData, initialIntervalSessionData } from '@/session/index.js';
-import * as countdown from '@/countdown/index.js';
+
+import { botAdmin } from '@/middlewares/botAdmin.js';
+import { errorHandler } from '@/middlewares/errorCatcher.js';
+import { runnerSequentialize } from '@/middlewares/sequentialize.js';
+
 import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from '@/errors/index.js';
+
 import type { CountDownContext } from '@/types/index.js';
 
 import config from '@/config/index.js';
-import { botAdmin } from '@/middlewares/botAdmin.js';
-import { runnerSequentialize } from '@/middlewares/sequentialize.js';
-import { run } from '@grammyjs/runner';
-import { errorHandler } from './middlewares/errorCatcher.js';
 
 async function main() {
     logger.info('Setting bot up');
