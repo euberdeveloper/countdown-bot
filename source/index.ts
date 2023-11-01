@@ -53,22 +53,21 @@ async function main() {
         handler: async ctx => {
             try {
                 const timeText = ctx.match;
-                const session = await ctx.session;
-                if (session.countdown.countdownActive) {
+                if (ctx.session.countdown.countdownActive) {
                     throw new CountDownAlreadyActiveError();
                 }
 
                 const setupResult = countdown.setUp(
                     timeText,
                     async () => {
-                        await ctx.reply(`${session.countdown.timeRemaining} remaining`);
+                        await ctx.reply(`${ctx.session.countdown.timeRemaining} remaining`);
                     },
                     async () => {
                         await ctx.reply('Countdown finished!');
                     }
                 );
-                session.countdown = setupResult.countdown;
-                session.interval = setupResult.interval;
+                ctx.session.countdown = setupResult.countdown;
+                ctx.session.interval = setupResult.interval;
             } catch (error) {
                 if (error instanceof TimeNotSpecifiedError) {
                     await ctx.reply('You have to write the counter time after the command (e.g. /countdown 10).');
@@ -93,8 +92,7 @@ async function main() {
         command: 'stop',
         description: 'Stops the countdown',
         handler: async ctx => {
-            const session = await ctx.session;
-            const wasActive = countdown.reset(session.countdown, session.interval);
+            const wasActive = countdown.reset(ctx.session.countdown, ctx.session.interval);
             await (!wasActive ? ctx.reply('There is no countdown active') : ctx.reply('Countdown stopped!'));
         }
     });
