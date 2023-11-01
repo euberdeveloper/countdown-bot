@@ -3,7 +3,7 @@ import { freeStorage } from '@grammyjs/storage-free';
 import logger from 'euberlog';
 
 import { addCommand, setCommandsHelp } from '@/commands/index.js';
-import {} from '@/session/index.js';
+import { initialCountdownSessionData, initialIntervalSessionData } from '@/session/index.js';
 import * as countdown from '@/countdown/index.js';
 import { CountDownAlreadyActiveError, InvalidTimeFormatError, TimeNotSpecifiedError } from '@/errors/index.js';
 import type { CountDownContext } from '@/types/index.js';
@@ -28,8 +28,8 @@ async function main() {
     bot.use(
         session({
             type: 'multi',
-            countdown: { initial: countdown.defaultCountdownInfo, storage: freeStorage(config.BOT_TOKEN) },
-            interval: { initial: countdown.defaultCountdownInterval }
+            countdown: { initial: initialCountdownSessionData, storage: freeStorage(config.BOT_TOKEN) },
+            interval: { initial: initialIntervalSessionData }
         })
     );
 
