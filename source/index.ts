@@ -1,5 +1,4 @@
 import { Bot, session } from 'grammy';
-import { freeStorage } from '@grammyjs/storage-free';
 import { run } from '@grammyjs/runner';
 import logger from 'euberlog';
 
@@ -31,7 +30,7 @@ async function main() {
     bot.use(
         session({
             type: 'multi',
-            countdown: { initial: initialCountdownSessionData, storage: freeStorage(config.BOT_TOKEN) },
+            countdown: { initial: initialCountdownSessionData },
             interval: { initial: initialIntervalSessionData }
         })
     );
